@@ -198,18 +198,17 @@ function setDateTextsFromDates(settings, startDate, endDate) {
   }
 }
 
-
-function numberToDateDisplay(n) {
+function numberToDateDisplay(n, format) {
   if (typeof n !== "number" || Number.isNaN(n)) return "";
 
   if (n > 10_000_000_000) {
     const d = new Date(n);
-    return Number.isNaN(d.getTime()) ? String(n) : toUIDateDisplay(d);
+    return Number.isNaN(d.getTime()) ? String(n) : formatDateForUI(d, format);
   }
 
   const base = new Date(Date.UTC(1899, 11, 30));
   const d = new Date(base.getTime() + n * 24 * 60 * 60 * 1000);
-  return Number.isNaN(d.getTime()) ? String(n) : toUIDateDisplay(d);
+  return Number.isNaN(d.getTime()) ? String(n) : formatDateForUI(d, format);
 }
 
 function tableauSerialNumberToDate(n) {
@@ -260,7 +259,7 @@ function getParamDateValue(p) {
   return null;
 }
 
-function getParamDisplay(p) {
+function getParamDisplay(p, format) {
   if (!p || !p.currentValue) return "";
   const cv = p.currentValue;
 
@@ -271,20 +270,28 @@ function getParamDisplay(p) {
 
   const raw = (cv && typeof cv === "object" && "value" in cv) ? cv.value : cv;
 
-  if (raw instanceof Date && !Number.isNaN(raw.getTime())) return toUIDateDisplay(raw);
+  if (raw instanceof Date && !Number.isNaN(raw.getTime())) {
+    return formatDateForUI(raw, format);
+  }
 
   if (typeof raw === "string") {
-    const normalized = raw.trim().replace(/\./g, "-");
+    const compact = raw.trim().match(/^(\d{4})(\d{2})(\d{2})$/);
+    if (compact) {
+      const d = new Date(Number(compact[1]), Number(compact[2]) - 1, Number(compact[3]));
+      if (!Number.isNaN(d.getTime())) return formatDateForUI(d, format);
+    }
+
+    const normalized = raw.trim().replace(/\./g, "-").replace(/\//g, "-");
     const d = new Date(normalized);
-    if (!Number.isNaN(d.getTime())) return toUIDateDisplay(d);
+    if (!Number.isNaN(d.getTime())) return formatDateForUI(d, format);
 
     const n = Number(raw);
-    if (!Number.isNaN(n)) return numberToDateDisplay(n);
+    if (!Number.isNaN(n)) return numberToDateDisplay(n, format);
 
     return raw;
   }
 
-  if (typeof raw === "number") return numberToDateDisplay(raw);
+  if (typeof raw === "number") return numberToDateDisplay(raw, format);
 
   return "";
 }
@@ -335,7 +342,7 @@ async function syncUIFromCurrentParameterValues(settings) {
 
   const pStart = map.get(settings.startParam);
   const startDate = getParamDateValue(pStart);
-  const startDisplay = getParamDisplay(pStart);
+  const startDisplay = getParamDisplay(pStart, settings.format);
 
   let endDate = null;
   let endDisplay = "";
@@ -346,7 +353,7 @@ async function syncUIFromCurrentParameterValues(settings) {
   } else {
     const pEnd = map.get(settings.endParam);
     endDate = getParamDateValue(pEnd);
-    endDisplay = getParamDisplay(pEnd);
+    endDisplay = getParamDisplay(pEnd, settings.format);
   }
 
   pendingStartDate = cloneDate(startDate);
@@ -571,27 +578,29 @@ function initFlatpickr(settings) {
       selectedQuickType = "";
       updateQuickSelectionUI();
 
+      const settingsNow = loadSettings();
+
       if (calendarMode === "start") {
-    const picked = selectedDates[0] || null;
-    if (!picked) return;
-    pendingStartDate = picked;
-  } else if (calendarMode === "end") {
-    const picked = selectedDates[0] || null;
-    if (!picked) return;
-    pendingEndDate = picked;
-  } else {
-    const start = selectedDates[0] || null;
-    const end = selectedDates[1] || null;
+        const picked = selectedDates[0] || null;
+        if (!picked) return;
+        pendingStartDate = picked;
+      } else if (calendarMode === "end") {
+        const picked = selectedDates[0] || null;
+        if (!picked) return;
+        pendingEndDate = picked;
+      } else {
+        const start = selectedDates[0] || null;
+        const end = selectedDates[1] || null;
 
-    pendingStartDate = start;
-    pendingEndDate = end || null;
-  }
+        pendingStartDate = start;
+        pendingEndDate = end || null;
+      }
 
-  setDateTextsFromDates(
-    settingsNow,
-    pendingStartDate,
-    settingsNow.kind === "single" ? pendingStartDate : pendingEndDate
-  );
+      setDateTextsFromDates(
+        settingsNow,
+        pendingStartDate,
+        settingsNow.kind === "single" ? pendingStartDate : pendingEndDate
+      );
 
       updateActionStates();
     },
@@ -757,10 +766,10 @@ function restorePendingToOriginal(settings) {
   hasUserSelectionInCurrentOpen = false;
 
   setDateTextsFromDates(
-  settings,
-  pendingStartDate,
-  settings.kind === "single" ? pendingStartDate : pendingEndDate
-);
+    settings,
+    pendingStartDate,
+    settings.kind === "single" ? pendingStartDate : pendingEndDate
+  );
 
   updateQuickSelectionUI();
 }
@@ -930,10 +939,10 @@ async function applyQuickSelection(type) {
     : cloneDate(range.end);
 
   setDateTextsFromDates(
-  settings,
-  pendingStartDate,
-  settings.kind === "single" ? pendingStartDate : pendingEndDate
-);
+    settings,
+    pendingStartDate,
+    settings.kind === "single" ? pendingStartDate : pendingEndDate
+  );
 
   setHint("");
   updateQuickSelectionUI();
