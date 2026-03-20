@@ -263,23 +263,26 @@ function getParamDisplay(p) {
 function updateDateFieldLayout() {
   const settings = loadSettings();
 
+  const rangeBar = qs("rangeBar");
   const startSlot = qs("startSlot");
   const endSlot = qs("endSlot");
   const startLabel = qs("startLabel");
   const endLabel = qs("endLabel");
   const sep = qs("dateSep");
 
+  if (rangeBar) {
+    rangeBar.classList.toggle("single-mode", settings.kind === "single");
+  }
+
   if (settings.kind === "single") {
     if (startSlot) startSlot.style.display = "none";
     if (sep) sep.style.display = "none";
-
     if (endSlot) endSlot.style.display = "flex";
     if (endLabel) endLabel.textContent = "조회날짜";
   } else {
     if (startSlot) startSlot.style.display = "flex";
     if (sep) sep.style.display = "";
     if (endSlot) endSlot.style.display = "flex";
-
     if (startLabel) startLabel.textContent = "시작날짜";
     if (endLabel) endLabel.textContent = "종료날짜";
   }
