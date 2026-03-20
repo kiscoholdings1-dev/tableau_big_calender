@@ -114,6 +114,20 @@ function toUIDateDisplay(d) {
   return `${y}. ${m}. ${day}.`;
 }
 
+function formatDateForUI(d, format) {
+  if (!(d instanceof Date) || Number.isNaN(d.getTime())) return "";
+
+  const fmt = format || DEFAULTS.format;
+
+  try {
+    if (window.flatpickr && typeof window.flatpickr.formatDate === "function") {
+      return window.flatpickr.formatDate(d, fmt);
+    }
+  } catch (_) {}
+
+  return toUIDateDisplay(d);
+}
+
 function cloneDate(d) {
   return d ? new Date(d.getTime()) : null;
 }
@@ -169,6 +183,21 @@ function setValueTexts(startDisplay, endDisplay) {
 
   updateValueHighlightState();
 }
+
+function setDateTextsFromDates(settings, startDate, endDate) {
+  if (settings.kind === "single") {
+    setValueTexts(
+      "",
+      startDate ? formatDateForUI(startDate, settings.format) : "-"
+    );
+  } else {
+    setValueTexts(
+      startDate ? formatDateForUI(startDate, settings.format) : "-",
+      endDate ? formatDateForUI(endDate, settings.format) : "-"
+    );
+  }
+}
+
 
 function numberToDateDisplay(n) {
   if (typeof n !== "number" || Number.isNaN(n)) return "";
@@ -332,12 +361,12 @@ async function syncUIFromCurrentParameterValues(settings) {
   if (settings.kind === "single") {
     setValueTexts(
       "",
-      startDisplay || (startDate ? toUIDateDisplay(startDate) : "")
+      startDisplay || (startDate ? formatDateForUI(startDate, settings.format) : "")
     );
   } else {
     setValueTexts(
-      startDisplay || (startDate ? toUIDateDisplay(startDate) : ""),
-      endDisplay || (endDate ? toUIDateDisplay(endDate) : "")
+      startDisplay || (startDate ? formatDateForUI(startDate, settings.format) : ""),
+      endDisplay || (endDate ? formatDateForUI(endDate, settings.format) : "")
     );
   }
 
@@ -391,6 +420,14 @@ function closeCalendarUI() {
   isCalendarOpen = false;
   const h = qs("calHost");
   if (h) h.classList.remove("open");
+
+  const settings = loadSettings();
+  setDateTextsFromDates(
+    settings,
+    pendingStartDate,
+    settings.kind === "single" ? pendingStartDate : pendingEndDate
+  );
+
   updateValueHighlightState();
   updateActionStates();
 }
@@ -535,43 +572,26 @@ function initFlatpickr(settings) {
       updateQuickSelectionUI();
 
       if (calendarMode === "start") {
-        const picked = selectedDates[0] || null;
-        if (!picked) return;
-        pendingStartDate = picked;
+    const picked = selectedDates[0] || null;
+    if (!picked) return;
+    pendingStartDate = picked;
+  } else if (calendarMode === "end") {
+    const picked = selectedDates[0] || null;
+    if (!picked) return;
+    pendingEndDate = picked;
+  } else {
+    const start = selectedDates[0] || null;
+    const end = selectedDates[1] || null;
 
-        const settingsNow = loadSettings();
-        if (settingsNow.kind === "single") {
-          setValueTexts(
-            "",
-            pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-"
-          );
-        } else {
-          setValueTexts(
-            pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-",
-            pendingEndDate ? toUIDateDisplay(pendingEndDate) : "-"
-          );
-        }
-      } else if (calendarMode === "end") {
-        const picked = selectedDates[0] || null;
-        if (!picked) return;
-        pendingEndDate = picked;
+    pendingStartDate = start;
+    pendingEndDate = end || null;
+  }
 
-        setValueTexts(
-          pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-",
-          pendingEndDate ? toUIDateDisplay(pendingEndDate) : "-"
-        );
-      } else {
-        const start = selectedDates[0] || null;
-        const end = selectedDates[1] || null;
-
-        pendingStartDate = start;
-        pendingEndDate = end || null;
-
-        setValueTexts(
-          pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-",
-          pendingEndDate ? toUIDateDisplay(pendingEndDate) : "-"
-        );
-      }
+  setDateTextsFromDates(
+    settingsNow,
+    pendingStartDate,
+    settingsNow.kind === "single" ? pendingStartDate : pendingEndDate
+  );
 
       updateActionStates();
     },
@@ -736,17 +756,11 @@ function restorePendingToOriginal(settings) {
   selectedQuickType = "";
   hasUserSelectionInCurrentOpen = false;
 
-  if (settings.kind === "single") {
-    setValueTexts(
-      "",
-      pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-"
-    );
-  } else {
-    setValueTexts(
-      pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-",
-      pendingEndDate ? toUIDateDisplay(pendingEndDate) : "-"
-    );
-  }
+  setDateTextsFromDates(
+  settings,
+  pendingStartDate,
+  settings.kind === "single" ? pendingStartDate : pendingEndDate
+);
 
   updateQuickSelectionUI();
 }
@@ -915,17 +929,11 @@ async function applyQuickSelection(type) {
     ? cloneDate(range.start)
     : cloneDate(range.end);
 
-  if (settings.kind === "single") {
-    setValueTexts(
-      "",
-      pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-"
-    );
-  } else {
-    setValueTexts(
-      pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-",
-      pendingEndDate ? toUIDateDisplay(pendingEndDate) : "-"
-    );
-  }
+  setDateTextsFromDates(
+  settings,
+  pendingStartDate,
+  settings.kind === "single" ? pendingStartDate : pendingEndDate
+);
 
   setHint("");
   updateQuickSelectionUI();
