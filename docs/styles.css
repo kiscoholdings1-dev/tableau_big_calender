@@ -11,7 +11,7 @@ html, body {
   height: 50px;
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   gap: 8px;
   padding: 0 10px;
   background: transparent;
@@ -20,34 +20,14 @@ html, body {
   overflow: hidden;
 }
 
-.rangeBar.single-mode {
-  justify-content: flex-start;
-}
-
-.rangeBar.single-mode .rangeLine {
-  flex: 0 0 auto;
-  min-width: 0;
-}
-
-.rangeBar.single-mode .dateSlot {
-  margin-right: 2px;
-}
-
-.rangeBar.single-mode #endSlot {
-  min-width: 0;
-}
-
-.rangeBar.single-mode .topActions {
-  margin-left: 2px;
-}
-
 .rangeLine {
   display: flex;
   align-items: center;
   gap: 6px;
   white-space: nowrap;
-  flex: 0 0 auto;
+  flex: 1 1 auto;
   min-width: 0;
+  justify-content: flex-start;
 }
 
 .dateSlot {
@@ -56,6 +36,28 @@ html, body {
   gap: 6px;
   min-width: 0;
   flex: 0 0 auto;
+}
+
+.rangeBar.single-mode .rangeLine {
+  justify-content: flex-end;
+}
+
+.rangeBar.single-mode #startSlot,
+.rangeBar.single-mode #dateSep {
+  display: none;
+}
+
+.rangeBar.single-mode #endSlot {
+  display: flex;
+  flex: 0 0 auto;
+}
+
+.topActions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex: 0 0 auto;
+  min-width: 0;
 }
 
 .label {
@@ -114,13 +116,6 @@ html, body {
   margin: 0;
 }
 
-.topActions {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex: 0 0 auto;
-  min-width: 0;
-}
 .miniBtn {
   height: 30px;
   min-width: 64px;
@@ -147,7 +142,6 @@ html, body {
   transform: translateY(-1px);
 }
 
-/* 버튼별 최소폭 */
 .btn-range-active,
 .btn-range-inactive,
 .btn-range-cancel {
@@ -165,7 +159,6 @@ html, body {
   min-width: 62px;
 }
 
-/* 기간변경 버튼: 파란 계열 */
 .btn-range-active {
   border: 1px solid rgba(49, 112, 245, 0.32);
   background: rgba(49, 112, 245, 0.08);
@@ -186,7 +179,6 @@ html, body {
   box-shadow: none;
 }
 
-/* 기간변경 취소 */
 .btn-range-cancel {
   border: 1px solid rgba(214, 67, 67, 0.30);
   background: rgba(214, 67, 67, 0.10);
@@ -199,7 +191,6 @@ html, body {
   border-color: rgba(214, 67, 67, 0.42);
 }
 
-/* 퀵선택 버튼: 초록 계열 */
 .btn-quick-active {
   border: 1px solid rgba(34, 154, 88, 0.34);
   background: rgba(34, 154, 88, 0.10);
@@ -220,7 +211,6 @@ html, body {
   box-shadow: none;
 }
 
-/* 퀵선택 취소 */
 .btn-quick-cancel {
   border: 1px solid rgba(214, 67, 67, 0.30);
   background: rgba(214, 67, 67, 0.10);
@@ -233,7 +223,6 @@ html, body {
   border-color: rgba(214, 67, 67, 0.42);
 }
 
-/* 적용 버튼 */
 .btn-primary-active {
   border: 1px solid #3170f5;
   background: #3170f5;
@@ -351,7 +340,6 @@ html, body {
   margin-left: 4px;
 }
 
-/* 확장 전체 높이 200 고정 전제에서 달력 영역 */
 .calHost {
   height: 136px;
   overflow: hidden;
@@ -362,7 +350,6 @@ html, body {
   box-sizing: border-box;
 }
 
-/* 달력 외곽 */
 .calHost .flatpickr-calendar {
   width: 100% !important;
   max-width: 100% !important;
@@ -377,7 +364,6 @@ html, body {
   box-sizing: border-box !important;
 }
 
-/* 헤더 */
 .calHost .flatpickr-months {
   width: 100% !important;
   min-width: 100% !important;
@@ -433,7 +419,6 @@ html, body {
   padding-right: 14px !important;
 }
 
-
 .calHost .flatpickr-current-month .cur-month {
   order: 2;
 }
@@ -474,7 +459,6 @@ html, body {
   height: 14px !important;
 }
 
-/* 요일 헤더 */
 .calHost .flatpickr-weekdays {
   width: 100% !important;
   height: 24px !important;
@@ -503,22 +487,18 @@ html, body {
   color: rgba(0,0,0,0.72) !important;
   background: transparent !important;
   box-sizing: border-box !important;
-
   flex: 0 0 14.2857% !important;
   width: 14.2857% !important;
   min-width: 14.2857% !important;
   max-width: 14.2857% !important;
-
   margin: 0 !important;
   padding: 0 !important;
-
   display: flex !important;
   align-items: center;
   justify-content: center;
   text-align: center !important;
 }
 
-/* flatpickr 내부 컨테이너는 숨기고, 날짜 본문만 스크롤 */
 .calHost .flatpickr-innerContainer,
 .calHost .flatpickr-rContainer {
   width: 100% !important;
@@ -552,7 +532,6 @@ html, body {
   box-sizing: border-box !important;
 }
 
-/* 날짜 칸 */
 .calHost .flatpickr-day {
   height: 24px !important;
   line-height: 24px !important;
@@ -620,14 +599,34 @@ html, body {
   overflow: auto;
 }
 
-.cfgHeader { margin-bottom: 6px; }
-.cfgTitle { font-size: 13px; font-weight: 900; }
-.cfgSub { margin-top: 2px; font-size: 11px; color: rgba(0,0,0,.6); }
+.cfgHeader {
+  margin-bottom: 6px;
+}
 
-.cfgRow { margin-top: 6px; }
-.cfgLabel { display: block; font-size: 11px; color: rgba(0,0,0,.65); margin-bottom: 4px; }
+.cfgTitle {
+  font-size: 13px;
+  font-weight: 900;
+}
 
-.cfgSelect, .cfgInput {
+.cfgSub {
+  margin-top: 2px;
+  font-size: 11px;
+  color: rgba(0,0,0,.6);
+}
+
+.cfgRow {
+  margin-top: 6px;
+}
+
+.cfgLabel {
+  display: block;
+  font-size: 11px;
+  color: rgba(0,0,0,.65);
+  margin-bottom: 4px;
+}
+
+.cfgSelect,
+.cfgInput {
   width: 100%;
   height: 30px;
   border-radius: 8px;
@@ -638,7 +637,12 @@ html, body {
   background: #fff;
 }
 
-.cfgHint { min-height: 14px; margin-top: 6px; font-size: 11px; color: rgba(0,0,0,.6); }
+.cfgHint {
+  min-height: 14px;
+  margin-top: 6px;
+  font-size: 11px;
+  color: rgba(0,0,0,.6);
+}
 
 .cfgFooter {
   display: flex;
@@ -685,8 +689,6 @@ html, body {
   z-index: 20;
   white-space: nowrap;
 }
-
-
 
 .toast.show {
   opacity: 1;
