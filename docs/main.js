@@ -142,9 +142,9 @@ function startOfDay(d) {
 function updateValueHighlightState() {
   const startEl = qs("startText");
   const endEl = qs("endText");
+  const settings = loadSettings();
 
   const shouldHighlight = (isCalendarOpen || isQuickOpen) && hasUserSelectionInCurrentOpen;
-  const settings = loadSettings();
 
   if (startEl) {
     const startChanged = !isSameDate(pendingStartDate, originalStartDate);
@@ -156,12 +156,7 @@ function updateValueHighlightState() {
     const comparePendingEnd = settings.kind === "single" ? pendingStartDate : pendingEndDate;
     const compareOriginalEnd = settings.kind === "single" ? originalStartDate : originalEndDate;
     const endChanged = !isSameDate(comparePendingEnd, compareOriginalEnd);
-
-    if (settings.kind === "single") {
-      endEl.classList.toggle("pending", shouldHighlight && endChanged);
-    } else {
-      endEl.classList.toggle("pending", shouldHighlight && endChanged);
-    }
+    endEl.classList.toggle("pending", shouldHighlight && endChanged);
   }
 }
 
@@ -268,36 +263,25 @@ function getParamDisplay(p) {
 function updateDateFieldLayout() {
   const settings = loadSettings();
 
+  const startSlot = qs("startSlot");
+  const endSlot = qs("endSlot");
   const startLabel = qs("startLabel");
-  const startText = qs("startText");
   const endLabel = qs("endLabel");
-  const endText = qs("endText");
   const sep = qs("dateSep");
 
   if (settings.kind === "single") {
-    if (startLabel) startLabel.style.display = "none";
-    if (startText) startText.style.display = "none";
+    if (startSlot) startSlot.style.display = "none";
     if (sep) sep.style.display = "none";
 
-    if (endLabel) {
-      endLabel.style.display = "";
-      endLabel.textContent = "조회날짜";
-    }
-    if (endText) endText.style.display = "";
+    if (endSlot) endSlot.style.display = "flex";
+    if (endLabel) endLabel.textContent = "조회날짜";
   } else {
-    if (startLabel) {
-      startLabel.style.display = "";
-      startLabel.textContent = "시작날짜";
-    }
-    if (startText) startText.style.display = "";
-
+    if (startSlot) startSlot.style.display = "flex";
     if (sep) sep.style.display = "";
+    if (endSlot) endSlot.style.display = "flex";
 
-    if (endLabel) {
-      endLabel.style.display = "";
-      endLabel.textContent = "종료날짜";
-    }
-    if (endText) endText.style.display = "";
+    if (startLabel) startLabel.textContent = "시작날짜";
+    if (endLabel) endLabel.textContent = "종료날짜";
   }
 }
 
