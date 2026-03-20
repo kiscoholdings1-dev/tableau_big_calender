@@ -866,7 +866,6 @@ async function applyPendingDates() {
 
   const err = getDateRangeError(settings);
   if (err) {
-    setHint(err);
     showToast(err);
     updateActionStates();
     return;
@@ -888,7 +887,6 @@ async function applyPendingDates() {
     setHint("");
   } catch (e) {
     const msg = e?.message || String(e);
-    setHint(msg);
     showToast(msg);
   } finally {
     isApplying = false;
