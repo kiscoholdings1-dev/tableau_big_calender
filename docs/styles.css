@@ -29,6 +29,14 @@ html, body {
   min-width: max-content;
 }
 
+.dateSlot {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 0 0 auto;
+}
+
 .label {
   font-size: 14px;
   font-weight: 800;
