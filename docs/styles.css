@@ -20,6 +20,27 @@ html, body {
   overflow: hidden;
 }
 
+.rangeBar.single-mode {
+  justify-content: flex-start;
+}
+
+.rangeBar.single-mode .rangeLine {
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.rangeBar.single-mode .dateSlot {
+  margin-right: 2px;
+}
+
+.rangeBar.single-mode #endSlot {
+  min-width: 0;
+}
+
+.rangeBar.single-mode .topActions {
+  margin-left: 2px;
+}
+
 .rangeLine {
   display: flex;
   align-items: center;
