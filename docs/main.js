@@ -182,6 +182,56 @@ function numberToDateDisplay(n) {
   return Number.isNaN(d.getTime()) ? String(n) : toUIDateDisplay(d);
 }
 
+/* ===== 추가: raw value를 실제 Date로 읽는 함수들 ===== */
+function tableauSerialNumberToDate(n) {
+  if (typeof n !== "number" || Number.isNaN(n)) return null;
+
+  if (n > 10_000_000_000) {
+    const d = new Date(n);
+    return Number.isNaN(d.getTime()) ? null : startOfDay(d);
+  }
+
+  const base = new Date(Date.UTC(1899, 11, 30));
+  const d = new Date(base.getTime() + n * 24 * 60 * 60 * 1000);
+  return Number.isNaN(d.getTime()) ? null : startOfDay(d);
+}
+
+function getParamDateValue(p) {
+  if (!p || !p.currentValue) return null;
+
+  const cv = p.currentValue;
+  const raw = (cv && typeof cv === "object" && "value" in cv) ? cv.value : cv;
+
+  if (raw instanceof Date && !Number.isNaN(raw.getTime())) {
+    return startOfDay(raw);
+  }
+
+  if (typeof raw === "string") {
+    const text = raw.trim();
+
+    // yyyyMMdd
+    const compact = text.match(/^(\d{4})(\d{2})(\d{2})$/);
+    if (compact) {
+      const d = new Date(Number(compact[1]), Number(compact[2]) - 1, Number(compact[3]));
+      return Number.isNaN(d.getTime()) ? null : startOfDay(d);
+    }
+
+    const normalized = text
+      .replace(/\./g, "-")
+      .replace(/\//g, "-")
+      .trim();
+
+    const d = new Date(normalized);
+    return Number.isNaN(d.getTime()) ? null : startOfDay(d);
+  }
+
+  if (typeof raw === "number") {
+    return tableauSerialNumberToDate(raw);
+  }
+
+  return null;
+}
+
 function getParamDisplay(p) {
   if (!p || !p.currentValue) return "";
   const cv = p.currentValue;
@@ -228,26 +278,30 @@ async function syncUIFromCurrentParameterValues(settings) {
   const map = await getParametersMap();
 
   const pStart = map.get(settings.startParam);
-  const startDisplay = getParamDisplay(pStart);
+  const startDate = getParamDateValue(pStart);
 
-  let endDisplay = "";
+  let endDate = null;
   if (settings.kind === "single") {
-    endDisplay = startDisplay;
+    endDate = startDate;
   } else {
     const pEnd = map.get(settings.endParam);
-    endDisplay = getParamDisplay(pEnd);
+    endDate = getParamDateValue(pEnd);
   }
 
-  pendingStartDate = parseDisplayToDate(startDisplay);
-  pendingEndDate = parseDisplayToDate(endDisplay);
+  pendingStartDate = cloneDate(startDate);
+  pendingEndDate = cloneDate(endDate);
 
-  originalStartDate = cloneDate(pendingStartDate);
-  originalEndDate = cloneDate(pendingEndDate);
+  originalStartDate = cloneDate(startDate);
+  originalEndDate = cloneDate(endDate);
 
   hasUserSelectionInCurrentOpen = false;
   selectedQuickType = "";
 
-  setValueTexts(startDisplay, endDisplay);
+  setValueTexts(
+    startDate ? toUIDateDisplay(startDate) : "",
+    endDate ? toUIDateDisplay(endDate) : ""
+  );
+
   updateQuickSelectionUI();
   updateActionStates();
 }
