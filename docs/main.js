@@ -262,17 +262,20 @@ function getParamDisplay(p) {
 function updateDateFieldLayout() {
   const settings = loadSettings();
 
+  const rangeBar = qs("rangeBar");
   const startLabel = qs("startLabel");
   const endLabel = qs("endLabel");
   const endText = qs("endText");
   const sep = qs("dateSep");
 
   if (settings.kind === "single") {
+    if (rangeBar) rangeBar.classList.add("single-mode");
     if (startLabel) startLabel.textContent = "조회날짜";
     if (endLabel) endLabel.style.display = "none";
     if (endText) endText.style.display = "none";
     if (sep) sep.style.display = "none";
   } else {
+    if (rangeBar) rangeBar.classList.remove("single-mode");
     if (startLabel) startLabel.textContent = "시작날짜";
     if (endLabel) {
       endLabel.style.display = "";
