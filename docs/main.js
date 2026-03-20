@@ -144,18 +144,24 @@ function updateValueHighlightState() {
   const endEl = qs("endText");
 
   const shouldHighlight = (isCalendarOpen || isQuickOpen) && hasUserSelectionInCurrentOpen;
+  const settings = loadSettings();
 
   if (startEl) {
     const startChanged = !isSameDate(pendingStartDate, originalStartDate);
-    startEl.classList.toggle("pending", shouldHighlight && startChanged);
+    const showStartPending = settings.kind === "range";
+    startEl.classList.toggle("pending", showStartPending && shouldHighlight && startChanged);
   }
 
   if (endEl) {
-    const settings = loadSettings();
     const comparePendingEnd = settings.kind === "single" ? pendingStartDate : pendingEndDate;
     const compareOriginalEnd = settings.kind === "single" ? originalStartDate : originalEndDate;
     const endChanged = !isSameDate(comparePendingEnd, compareOriginalEnd);
-    endEl.classList.toggle("pending", shouldHighlight && endChanged && settings.kind === "range");
+
+    if (settings.kind === "single") {
+      endEl.classList.toggle("pending", shouldHighlight && endChanged);
+    } else {
+      endEl.classList.toggle("pending", shouldHighlight && endChanged);
+    }
   }
 }
 
@@ -262,27 +268,36 @@ function getParamDisplay(p) {
 function updateDateFieldLayout() {
   const settings = loadSettings();
 
-  const rangeBar = qs("rangeBar");
   const startLabel = qs("startLabel");
+  const startText = qs("startText");
   const endLabel = qs("endLabel");
   const endText = qs("endText");
   const sep = qs("dateSep");
 
   if (settings.kind === "single") {
-    if (rangeBar) rangeBar.classList.add("single-mode");
-    if (startLabel) startLabel.textContent = "조회날짜";
-    if (endLabel) endLabel.style.display = "none";
-    if (endText) endText.style.display = "none";
+    if (startLabel) startLabel.style.display = "none";
+    if (startText) startText.style.display = "none";
     if (sep) sep.style.display = "none";
+
+    if (endLabel) {
+      endLabel.style.display = "";
+      endLabel.textContent = "조회날짜";
+    }
+    if (endText) endText.style.display = "";
   } else {
-    if (rangeBar) rangeBar.classList.remove("single-mode");
-    if (startLabel) startLabel.textContent = "시작날짜";
+    if (startLabel) {
+      startLabel.style.display = "";
+      startLabel.textContent = "시작날짜";
+    }
+    if (startText) startText.style.display = "";
+
+    if (sep) sep.style.display = "";
+
     if (endLabel) {
       endLabel.style.display = "";
       endLabel.textContent = "종료날짜";
     }
     if (endText) endText.style.display = "";
-    if (sep) sep.style.display = "";
   }
 }
 
@@ -327,10 +342,17 @@ async function syncUIFromCurrentParameterValues(settings) {
   hasUserSelectionInCurrentOpen = false;
   selectedQuickType = "";
 
-  setValueTexts(
-    startDisplay || (startDate ? toUIDateDisplay(startDate) : ""),
-    endDisplay || (endDate ? toUIDateDisplay(endDate) : "")
-  );
+  if (settings.kind === "single") {
+    setValueTexts(
+      "",
+      startDisplay || (startDate ? toUIDateDisplay(startDate) : "")
+    );
+  } else {
+    setValueTexts(
+      startDisplay || (startDate ? toUIDateDisplay(startDate) : ""),
+      endDisplay || (endDate ? toUIDateDisplay(endDate) : "")
+    );
+  }
 
   updateQuickSelectionUI();
   updateActionStates();
@@ -343,8 +365,8 @@ async function syncUIWithRetry(settings, tries = 8, delayMs = 250) {
     const s = qs("startText")?.textContent?.trim();
     const e = qs("endText")?.textContent?.trim();
 
-    const okStart = s && s !== "-";
-    const okEnd = settings.kind === "single" ? true : (e && e !== "-");
+    const okStart = settings.kind === "single" ? true : (s && s !== "-");
+    const okEnd = e && e !== "-";
 
     if (okStart && okEnd) return;
     await new Promise((r) => setTimeout(r, delayMs));
@@ -530,10 +552,18 @@ function initFlatpickr(settings) {
         if (!picked) return;
         pendingStartDate = picked;
 
-        setValueTexts(
-          pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-",
-          pendingEndDate ? toUIDateDisplay(pendingEndDate) : "-"
-        );
+        const settingsNow = loadSettings();
+        if (settingsNow.kind === "single") {
+          setValueTexts(
+            "",
+            pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-"
+          );
+        } else {
+          setValueTexts(
+            pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-",
+            pendingEndDate ? toUIDateDisplay(pendingEndDate) : "-"
+          );
+        }
       } else if (calendarMode === "end") {
         const picked = selectedDates[0] || null;
         if (!picked) return;
@@ -719,10 +749,17 @@ function restorePendingToOriginal(settings) {
   selectedQuickType = "";
   hasUserSelectionInCurrentOpen = false;
 
-  setValueTexts(
-    pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-",
-    pendingEndDate ? toUIDateDisplay(pendingEndDate) : "-"
-  );
+  if (settings.kind === "single") {
+    setValueTexts(
+      "",
+      pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-"
+    );
+  } else {
+    setValueTexts(
+      pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-",
+      pendingEndDate ? toUIDateDisplay(pendingEndDate) : "-"
+    );
+  }
 
   updateQuickSelectionUI();
 }
@@ -891,12 +928,17 @@ async function applyQuickSelection(type) {
     ? cloneDate(range.start)
     : cloneDate(range.end);
 
-  setValueTexts(
-    pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-",
-    (settings.kind === "single" ? pendingStartDate : pendingEndDate)
-      ? toUIDateDisplay(settings.kind === "single" ? pendingStartDate : pendingEndDate)
-      : "-"
-  );
+  if (settings.kind === "single") {
+    setValueTexts(
+      "",
+      pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-"
+    );
+  } else {
+    setValueTexts(
+      pendingStartDate ? toUIDateDisplay(pendingStartDate) : "-",
+      pendingEndDate ? toUIDateDisplay(pendingEndDate) : "-"
+    );
+  }
 
   setHint("");
   updateQuickSelectionUI();
@@ -1088,6 +1130,8 @@ function bindHandlers() {
   if (startText) {
     startText.onclick = (e) => {
       e.stopPropagation();
+      const settings = loadSettings();
+      if (settings.kind === "single") return;
       openCalendarFor("start");
     };
   }
@@ -1096,7 +1140,12 @@ function bindHandlers() {
     endText.onclick = (e) => {
       e.stopPropagation();
       const settings = loadSettings();
-      if (settings.kind === "single") return;
+
+      if (settings.kind === "single") {
+        openCalendarFor("start");
+        return;
+      }
+
       openCalendarFor("end");
     };
   }
