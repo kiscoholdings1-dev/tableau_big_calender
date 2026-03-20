@@ -259,6 +259,30 @@ function getParamDisplay(p) {
   return "";
 }
 
+function updateDateFieldLayout() {
+  const settings = loadSettings();
+
+  const startLabel = qs("startLabel");
+  const endLabel = qs("endLabel");
+  const endText = qs("endText");
+  const sep = qs("dateSep");
+
+  if (settings.kind === "single") {
+    if (startLabel) startLabel.textContent = "조회날짜";
+    if (endLabel) endLabel.style.display = "none";
+    if (endText) endText.style.display = "none";
+    if (sep) sep.style.display = "none";
+  } else {
+    if (startLabel) startLabel.textContent = "시작날짜";
+    if (endLabel) {
+      endLabel.style.display = "";
+      endLabel.textContent = "종료날짜";
+    }
+    if (endText) endText.style.display = "";
+    if (sep) sep.style.display = "";
+  }
+}
+
 async function syncUIFromCurrentParameterValues(settings) {
   if (!settings.startParam) {
     pendingStartDate = null;
@@ -1068,6 +1092,8 @@ function bindHandlers() {
   if (endText) {
     endText.onclick = (e) => {
       e.stopPropagation();
+      const settings = loadSettings();
+      if (settings.kind === "single") return;
       openCalendarFor("end");
     };
   }
@@ -1159,18 +1185,15 @@ function updateQuickPanelVisibility() {
   const weekBtn = document.querySelector('[data-quick="thisWeek"]');
   const monthBtn = document.querySelector('[data-quick="thisMonth"]');
   const ytdBtn = document.querySelector('[data-quick="ytd"]');
-  const hintEl = qs("quickHint");
 
   if (settings.kind === "single") {
     if (weekBtn) weekBtn.style.display = "none";
     if (monthBtn) monthBtn.style.display = "none";
     if (ytdBtn) ytdBtn.style.display = "none";
-    if (hintEl) hintEl.style.display = "none";
   } else {
     if (weekBtn) weekBtn.style.display = "";
     if (monthBtn) monthBtn.style.display = "";
     if (ytdBtn) ytdBtn.style.display = "";
-    if (hintEl) hintEl.style.display = "";
   }
 }
 
@@ -1201,6 +1224,7 @@ async function render() {
 
   initFlatpickr(settings);
   bindHandlers();
+  updateDateFieldLayout();
   updateQuickPanelVisibility();
   await bindParameterChangedListeners(settings);
 
