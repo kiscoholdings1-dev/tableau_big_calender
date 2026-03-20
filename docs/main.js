@@ -182,7 +182,6 @@ function numberToDateDisplay(n) {
   return Number.isNaN(d.getTime()) ? String(n) : toUIDateDisplay(d);
 }
 
-/* ===== 추가: raw value를 실제 Date로 읽는 함수들 ===== */
 function tableauSerialNumberToDate(n) {
   if (typeof n !== "number" || Number.isNaN(n)) return null;
 
@@ -209,7 +208,6 @@ function getParamDateValue(p) {
   if (typeof raw === "string") {
     const text = raw.trim();
 
-    // yyyyMMdd
     const compact = text.match(/^(\d{4})(\d{2})(\d{2})$/);
     if (compact) {
       const d = new Date(Number(compact[1]), Number(compact[2]) - 1, Number(compact[3]));
@@ -279,13 +277,18 @@ async function syncUIFromCurrentParameterValues(settings) {
 
   const pStart = map.get(settings.startParam);
   const startDate = getParamDateValue(pStart);
+  const startDisplay = getParamDisplay(pStart);
 
   let endDate = null;
+  let endDisplay = "";
+
   if (settings.kind === "single") {
     endDate = startDate;
+    endDisplay = startDisplay;
   } else {
     const pEnd = map.get(settings.endParam);
     endDate = getParamDateValue(pEnd);
+    endDisplay = getParamDisplay(pEnd);
   }
 
   pendingStartDate = cloneDate(startDate);
@@ -298,8 +301,8 @@ async function syncUIFromCurrentParameterValues(settings) {
   selectedQuickType = "";
 
   setValueTexts(
-    startDate ? toUIDateDisplay(startDate) : "",
-    endDate ? toUIDateDisplay(endDate) : ""
+    startDisplay || (startDate ? toUIDateDisplay(startDate) : ""),
+    endDisplay || (endDate ? toUIDateDisplay(endDate) : "")
   );
 
   updateQuickSelectionUI();
