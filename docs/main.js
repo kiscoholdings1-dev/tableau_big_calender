@@ -32,6 +32,7 @@ let calendarMode = "range"; // "start" | "end" | "range"
 let hasUserSelectionInCurrentOpen = false;
 let toastTimer = null;
 let selectedQuickType = "";
+let lastEditedEdge = ""; // "start" | "end" | "range" | "quick"
 
 function qs(id) {
   return document.getElementById(id);
@@ -332,6 +333,7 @@ async function syncUIFromCurrentParameterValues(settings) {
     originalEndDate = null;
     hasUserSelectionInCurrentOpen = false;
     selectedQuickType = "";
+    lastEditedEdge = "";
     setValueTexts("", "");
     updateQuickSelectionUI();
     updateActionStates();
@@ -364,6 +366,7 @@ async function syncUIFromCurrentParameterValues(settings) {
 
   hasUserSelectionInCurrentOpen = false;
   selectedQuickType = "";
+  lastEditedEdge = "";
 
   if (settings.kind === "single") {
     setValueTexts(
@@ -584,16 +587,19 @@ function initFlatpickr(settings) {
         const picked = selectedDates[0] || null;
         if (!picked) return;
         pendingStartDate = picked;
+        lastEditedEdge = "start";
       } else if (calendarMode === "end") {
         const picked = selectedDates[0] || null;
         if (!picked) return;
         pendingEndDate = picked;
+        lastEditedEdge = "end";
       } else {
         const start = selectedDates[0] || null;
         const end = selectedDates[1] || null;
 
         pendingStartDate = start;
         pendingEndDate = end || null;
+        lastEditedEdge = "range";
       }
 
       setDateTextsFromDates(
@@ -764,6 +770,7 @@ function restorePendingToOriginal(settings) {
   pendingEndDate = settings.kind === "single" ? cloneDate(originalStartDate) : cloneDate(originalEndDate);
   selectedQuickType = "";
   hasUserSelectionInCurrentOpen = false;
+  lastEditedEdge = "";
 
   setDateTextsFromDates(
     settings,
@@ -822,7 +829,9 @@ function cancelQuickSelection() {
 }
 
 function getDateRangeError(settings) {
-  if (!pendingStartDate) return "시작날짜를 선택하세요.";
+  if (!pendingStartDate) {
+    return settings.kind === "single" ? "조회날짜를 선택하세요." : "시작날짜를 선택하세요.";
+  }
 
   const finalEnd = settings.kind === "single" ? pendingStartDate : pendingEndDate;
 
@@ -836,7 +845,15 @@ function getDateRangeError(settings) {
     finalEnd &&
     pendingStartDate > finalEnd
   ) {
-    return "시작날짜는 종료날짜보다 늦을 수 없습니다.";
+    if (lastEditedEdge === "end") {
+      return "종료날짜는 시작날짜 이전으로 선택할 수 없습니다.";
+    }
+
+    if (lastEditedEdge === "start") {
+      return "시작날짜는 종료날짜 이후로 선택할 수 없습니다.";
+    }
+
+    return "시작날짜와 종료날짜를 다시 확인하세요.";
   }
 
   return "";
@@ -932,6 +949,7 @@ async function applyQuickSelection(type) {
 
   hasUserSelectionInCurrentOpen = true;
   selectedQuickType = type;
+  lastEditedEdge = "quick";
 
   pendingStartDate = cloneDate(range.start);
   pendingEndDate = settings.kind === "single"
@@ -1271,6 +1289,7 @@ async function render() {
     originalEndDate = null;
     hasUserSelectionInCurrentOpen = false;
     selectedQuickType = "";
+    lastEditedEdge = "";
     setValueTexts("", "");
     updateQuickSelectionUI();
     updateActionStates();
