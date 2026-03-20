@@ -659,31 +659,7 @@ html, body {
 }
 
 
-.rangeBar.single-mode {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
 
-.rangeBar.single-mode .rangeLine {
-  flex: 0 0 auto;
-  width: auto;
-  min-width: 0;
-}
-
-.rangeBar.single-mode .topActions {
-  flex: 0 0 auto;
-  margin-left: auto;
-}
-
-.rangeBar.single-mode .label {
-  margin-right: 6px;
-}
-
-.rangeBar.single-mode .dateValue {
-  min-width: auto;
-}
 .toast.show {
   opacity: 1;
   transform: translateX(-50%) translateY(0);
