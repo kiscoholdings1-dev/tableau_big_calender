@@ -341,12 +341,12 @@ html, body {
 }
 
 .calHost {
-  height: 182px;
+  height: 150px;
   overflow: hidden;
   overflow-x: hidden;
   border-top: 1px solid rgba(0,0,0,0.10);
   background: rgba(255,255,255,0.98);
-  padding: 4px 6px;
+  padding: 2px 4px;
   box-sizing: border-box;
 }
 
@@ -371,18 +371,18 @@ html, body {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 26px !important;
+  height: 22px !important;
   margin-bottom: 0;
   position: relative;
-  gap: 4px;
-  padding: 0 6px;
+  gap: 2px;
+  padding: 0 4px;
   box-sizing: border-box !important;
   background: #fff;
   border-bottom: 1px solid rgba(0,0,0,0.14) !important;
 }
 
 .calHost .flatpickr-month {
-  height: 26px !important;
+  height: 22px !important;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -396,10 +396,10 @@ html, body {
   justify-content: center;
   gap: 2px;
   width: auto !important;
-  height: 26px !important;
+  height: 22px !important;
   padding: 0 !important;
   left: auto !important;
-  font-size: 13px !important;
+  font-size: 12px !important;
   line-height: 1 !important;
   position: static !important;
   flex: 0 1 auto;
@@ -410,13 +410,13 @@ html, body {
   position: relative;
   display: inline-flex !important;
   align-items: center;
-  width: 54px !important;
+  width: 50px !important;
 }
 
 .calHost .flatpickr-current-month .numInputWrapper .cur-year {
   order: 1;
   text-align: left !important;
-  padding-right: 10px !important;
+  padding-right: 8px !important;
 }
 
 .calHost .flatpickr-current-month .cur-month {
@@ -424,12 +424,12 @@ html, body {
 }
 
 .calHost .flatpickr-current-month .flatpickr-monthDropdown-months {
-  max-width: 74px;
+  max-width: 68px;
 }
 
 .calHost .flatpickr-current-month .flatpickr-monthDropdown-months,
 .calHost .flatpickr-current-month input.cur-year {
-  font-size: 13px !important;
+  font-size: 12px !important;
   font-weight: 800;
 }
 
@@ -441,11 +441,11 @@ html, body {
   display: flex !important;
   align-items: center;
   justify-content: center;
-  height: 26px !important;
-  width: 18px !important;
-  min-width: 18px !important;
+  height: 22px !important;
+  width: 16px !important;
+  min-width: 16px !important;
   color: rgba(0,0,0,0.78) !important;
-  flex: 0 0 18px;
+  flex: 0 0 16px;
 }
 
 .calHost .flatpickr-prev-month:hover,
@@ -455,13 +455,13 @@ html, body {
 
 .calHost .flatpickr-prev-month svg,
 .calHost .flatpickr-next-month svg {
-  width: 11px !important;
-  height: 11px !important;
+  width: 10px !important;
+  height: 10px !important;
 }
 
 .calHost .flatpickr-weekdays {
   width: 100% !important;
-  height: 18px !important;
+  height: 16px !important;
   margin-bottom: 0;
   background: #fff !important;
   border-bottom: 1px solid rgba(0,0,0,0.10) !important;
@@ -480,9 +480,9 @@ html, body {
 }
 
 .calHost .flatpickr-weekday {
-  height: 18px !important;
-  line-height: 18px !important;
-  font-size: 10px !important;
+  height: 16px !important;
+  line-height: 16px !important;
+  font-size: 9px !important;
   font-weight: 700 !important;
   color: rgba(0,0,0,0.72) !important;
   background: transparent !important;
@@ -513,11 +513,12 @@ html, body {
   width: 100% !important;
   min-width: 100% !important;
   max-width: 100% !important;
-  height: auto !important;
+  height: 96px !important;
   max-height: none !important;
   overflow-y: hidden !important;
   overflow-x: hidden !important;
-  display: block !important;
+  display: flex !important;
+  align-items: flex-start !important;
   box-sizing: border-box !important;
 }
 
@@ -525,18 +526,22 @@ html, body {
   width: 100% !important;
   min-width: 100% !important;
   max-width: 100% !important;
-  height: auto !important;
-  min-height: 108px !important;
-  display: block !important;
+  height: 96px !important;
+  min-height: 96px !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  align-content: flex-start !important;
+  justify-content: flex-start !important;
   box-sizing: border-box !important;
 }
 
 .calHost .flatpickr-day {
-  height: 18px !important;
-  line-height: 18px !important;
-  font-size: 10px !important;
+  height: 16px !important;
+  line-height: 16px !important;
+  font-size: 9px !important;
   font-weight: 500 !important;
   width: 14.2857% !important;
+  min-width: 14.2857% !important;
   max-width: 14.2857% !important;
   margin: 0 !important;
   border: 0 !important;
@@ -546,6 +551,10 @@ html, body {
   box-shadow:
     inset -1px 0 0 rgba(0,0,0,0.10),
     inset 0 -1px 0 rgba(0,0,0,0.10);
+}
+
+.calHost .rangeMode .flatpickr-day {
+  margin-top: 0 !important;
 }
 
 .calHost .flatpickr-day.prevMonthDay,
