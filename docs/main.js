@@ -911,6 +911,13 @@ function getTodayRange() {
   return { start: today, end: today };
 }
 
+function getYesterdayRange() {
+  const today = startOfDay(new Date());
+  const yesterday = new Date(today);
+  yesterday.setDate(today.getDate() - 1);
+  return { start: startOfDay(yesterday), end: startOfDay(yesterday) };
+}
+
 function getThisWeekRange() {
   const today = startOfDay(new Date());
   const day = today.getDay();
@@ -938,6 +945,8 @@ function getQuickRange(type) {
   switch (type) {
     case "today":
       return getTodayRange();
+    case "yesterday":
+      return getYesterdayRange();
     case "thisWeek":
       return getThisWeekRange();
     case "thisMonth":
