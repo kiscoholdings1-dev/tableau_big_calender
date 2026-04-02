@@ -918,6 +918,13 @@ function getYesterdayRange() {
   return { start: startOfDay(yesterday), end: startOfDay(yesterday) };
 }
 
+function getPreviousMonthRange() {
+  const today = startOfDay(new Date());
+  const prevMonthLastDay = new Date(today.getFullYear(), today.getMonth(), 0);
+  const picked = startOfDay(prevMonthLastDay);
+  return { start: picked, end: picked };
+}
+
 function getThisWeekRange() {
   const today = startOfDay(new Date());
   const day = today.getDay();
@@ -941,7 +948,18 @@ function getYtdRange() {
   return { start: startOfDay(start), end: today };
 }
 
-function getQuickRange(type) {
+function getQuickRange(settings, type) {
+  if (settings.kind === "single") {
+    switch (type) {
+      case "today":
+        return getTodayRange();
+      case "yesterday":
+        return getPreviousMonthRange();
+      default:
+        return null;
+    }
+  }
+
   switch (type) {
     case "today":
       return getTodayRange();
@@ -962,7 +980,7 @@ async function applyQuickSelection(type) {
   if (isApplying || isConfigOpen || !isQuickOpen) return;
 
   const settings = loadSettings();
-  const range = getQuickRange(type);
+  const range = getQuickRange(settings, type);
   if (!range) return;
 
   hasUserSelectionInCurrentOpen = true;
@@ -1274,15 +1292,27 @@ function bindHandlers() {
 
 function updateQuickPanelVisibility() {
   const settings = loadSettings();
+  const todayBtn = document.querySelector('[data-quick="today"]');
+  const yesterdayBtn = document.querySelector('[data-quick="yesterday"]');
   const weekBtn = document.querySelector('[data-quick="thisWeek"]');
   const monthBtn = document.querySelector('[data-quick="thisMonth"]');
   const ytdBtn = document.querySelector('[data-quick="ytd"]');
 
   if (settings.kind === "single") {
+    if (todayBtn) todayBtn.textContent = "당월";
+    if (yesterdayBtn) {
+      yesterdayBtn.textContent = "전월";
+      yesterdayBtn.style.display = "";
+    }
     if (weekBtn) weekBtn.style.display = "none";
     if (monthBtn) monthBtn.style.display = "none";
     if (ytdBtn) ytdBtn.style.display = "none";
   } else {
+    if (todayBtn) todayBtn.textContent = "금일";
+    if (yesterdayBtn) {
+      yesterdayBtn.textContent = "전일";
+      yesterdayBtn.style.display = "";
+    }
     if (weekBtn) weekBtn.style.display = "";
     if (monthBtn) monthBtn.style.display = "";
     if (ytdBtn) ytdBtn.style.display = "";
