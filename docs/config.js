@@ -9,7 +9,7 @@ const SETTINGS_KEYS = {
 
 const DEFAULTS = {
   kind: "range",
-  format: "Y-m-d",
+  format: "Y. n. j",
 };
 
 function qs(id) { return document.getElementById(id); }
@@ -22,6 +22,17 @@ function setHint(msg) {
 function setEndRowVisible(isVisible) {
   const row = qs("rowEnd");
   if (row) row.style.display = isVisible ? "" : "none";
+}
+
+function normalizeDisplayFormat(format) {
+  const value = String(format || "").trim();
+  if (!value) return DEFAULTS.format;
+
+  if (["Y-m-d", "Y. m. d", "Y.m.d", "Y/m/d"].includes(value)) {
+    return DEFAULTS.format;
+  }
+
+  return value;
 }
 
 function detectType(p) {
@@ -58,7 +69,7 @@ function readCurrentSettings() {
     kind: s.get(SETTINGS_KEYS.kind) || DEFAULTS.kind,
     startParam: s.get(SETTINGS_KEYS.startParam) || "",
     endParam: s.get(SETTINGS_KEYS.endParam) || "",
-    format: s.get(SETTINGS_KEYS.format) || DEFAULTS.format,
+    format: normalizeDisplayFormat(s.get(SETTINGS_KEYS.format)),
   };
 }
 
@@ -122,7 +133,7 @@ async function init() {
         const kind = kindSel ? kindSel.value : DEFAULTS.kind;
         const startParam = startSel ? startSel.value : "";
         const endParam = endSel ? endSel.value : "";
-        const format = (formatInput ? formatInput.value : DEFAULTS.format).trim() || DEFAULTS.format;
+        const format = normalizeDisplayFormat(formatInput ? formatInput.value : DEFAULTS.format);
 
         if (!startParam) throw new Error("시작 파라미터를 선택하세요.");
         if (kind === "range" && !endParam) throw new Error("종료 파라미터를 선택하세요.");

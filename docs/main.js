@@ -9,7 +9,7 @@ const SETTINGS_KEYS = {
 
 const DEFAULTS = {
   kind: "range",
-  format: "Y. m. d",
+  format: "Y. n. j",
 };
 
 const FRAME_WIDTH = 600;
@@ -65,13 +65,24 @@ function isAuthoringMode() {
   return tableau?.extensions?.environment?.mode === "authoring";
 }
 
+function normalizeDisplayFormat(format) {
+  const value = String(format || "").trim();
+  if (!value) return DEFAULTS.format;
+
+  if (["Y-m-d", "Y. m. d", "Y.m.d", "Y/m/d"].includes(value)) {
+    return DEFAULTS.format;
+  }
+
+  return value;
+}
+
 function loadSettings() {
   const s = tableau.extensions.settings;
   return {
     kind: s.get(SETTINGS_KEYS.kind) || DEFAULTS.kind,
     startParam: s.get(SETTINGS_KEYS.startParam) || "",
     endParam: s.get(SETTINGS_KEYS.endParam) || "",
-    format: s.get(SETTINGS_KEYS.format) || DEFAULTS.format,
+    format: normalizeDisplayFormat(s.get(SETTINGS_KEYS.format)),
   };
 }
 
@@ -118,7 +129,7 @@ function toUIDateDisplay(d) {
 function formatDateForUI(d, format) {
   if (!(d instanceof Date) || Number.isNaN(d.getTime())) return "";
 
-  const fmt = format || DEFAULTS.format;
+  const fmt = normalizeDisplayFormat(format);
 
   try {
     if (window.flatpickr && typeof window.flatpickr.formatDate === "function") {
@@ -1042,7 +1053,7 @@ async function hydrateConfigPanel(settings) {
   const rowEnd = qs("rowEnd");
 
   if (kindSel) kindSel.value = settings.kind;
-  if (formatInput) formatInput.value = settings.format || DEFAULTS.format;
+  if (formatInput) formatInput.value = normalizeDisplayFormat(settings.format);
 
   if (startSel) fillSelect(startSel, items, settings.startParam);
   if (endSel) fillSelect(endSel, items, settings.endParam);
@@ -1069,7 +1080,7 @@ async function saveConfigFromPanel() {
     const kind = (kindSel ? kindSel.value : DEFAULTS.kind) || DEFAULTS.kind;
     const startParam = startSel ? startSel.value : "";
     const endParam = endSel ? endSel.value : "";
-    const format = (formatInput ? formatInput.value : DEFAULTS.format).trim() || DEFAULTS.format;
+    const format = normalizeDisplayFormat(formatInput ? formatInput.value : DEFAULTS.format);
 
     if (!startParam) throw new Error("시작 파라미터를 선택하세요.");
     if (kind === "range" && !endParam) throw new Error("종료 파라미터를 선택하세요.");
