@@ -341,7 +341,7 @@ html, body {
 }
 
 .calHost {
-  height: 150px;
+  height: 156px;
   overflow: hidden;
   overflow-x: hidden;
   border-top: 1px solid rgba(0,0,0,0.10);
@@ -518,7 +518,7 @@ html, body {
   width: 100% !important;
   min-width: 100% !important;
   max-width: 100% !important;
-  height: 96px !important;
+  height: 102px !important;
   max-height: none !important;
   overflow-y: hidden !important;
   overflow-x: hidden !important;
@@ -531,8 +531,8 @@ html, body {
   width: 100% !important;
   min-width: 100% !important;
   max-width: 100% !important;
-  height: 96px !important;
-  min-height: 96px !important;
+  height: 102px !important;
+  min-height: 102px !important;
   display: flex !important;
   flex-wrap: wrap !important;
   align-content: flex-start !important;
@@ -541,8 +541,8 @@ html, body {
 }
 
 .calHost .flatpickr-day {
-  height: 16px !important;
-  line-height: 16px !important;
+  height: 17px !important;
+  line-height: 17px !important;
   font-size: 10px !important;
   font-weight: 600 !important;
   color: rgba(0,0,0,0.86) !important;
