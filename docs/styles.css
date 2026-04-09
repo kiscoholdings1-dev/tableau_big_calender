@@ -122,10 +122,13 @@ html, body {
   min-width: 48px;
   padding: 0 7px;
   border-radius: 7px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   font-size: 10px;
   font-weight: 800;
-  line-height: 1;
+  line-height: 1.1;
   white-space: nowrap;
   word-break: keep-all;
   overflow: hidden;
@@ -158,6 +161,13 @@ html, body {
 .btn-primary-active,
 .btn-primary-inactive {
   min-width: 42px;
+}
+
+#closePanelBtn {
+  min-width: 58px;
+  display: none;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-range-active {

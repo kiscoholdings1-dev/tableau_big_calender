@@ -770,10 +770,20 @@ function updateApplyButton() {
   }
 }
 
+function updateClosePanelButton() {
+  const btn = qs("closePanelBtn");
+  if (!btn) return;
+
+  const visible = isCalendarOpen || isQuickOpen;
+  btn.style.display = visible ? "inline-flex" : "none";
+  btn.disabled = isApplying || !visible;
+}
+
 function updateActionStates() {
   updatePrimaryModeButton();
   updateQuickModeButton();
   updateApplyButton();
+  updateClosePanelButton();
 }
 
 function restorePendingToOriginal(settings) {
@@ -1177,6 +1187,7 @@ function bindHandlers() {
   const rangeModeBtn = qs("rangeModeBtn");
   const quickModeBtn = qs("quickModeBtn");
   const applyBtn = qs("applyBtn");
+  const closePanelBtn = qs("closePanelBtn");
   const settingsBtn = qs("settingsBtn");
   const cfgCloseBtn = qs("cfgCloseBtn");
   const cfgSaveBtn = qs("cfgSaveBtn");
@@ -1261,6 +1272,19 @@ function bindHandlers() {
       const settings = loadSettings();
       if (!canEnableApply(settings) && !isApplying) return;
       await applyPendingDates();
+    };
+  }
+
+  if (closePanelBtn) {
+    closePanelBtn.onclick = (e) => {
+      e.stopPropagation();
+      if (isQuickPickingMode()) {
+        cancelQuickSelection();
+        return;
+      }
+      if (isDateEditingState()) {
+        cancelRangeSelection();
+      }
     };
   }
 
